@@ -1,0 +1,72 @@
+<!doctype>
+<html>
+	<head>
+		<title>Pastel Color Generator</title>
+		<style>
+			body{
+				background-color: #ffffff;
+			}
+			ul, li {
+				list-style:none;
+				margin:0;
+				padding:0;
+			}
+
+			ul li {
+				width:200px;
+				height:200px;
+				float: left;
+			}
+		</style>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+		<script>
+			function createPastelColor () {
+				var fuzz = 50
+				,	base = 128
+				,	shift = 128
+
+				,	randomInRange = function (min, max) { return Math.floor(min + (Math.random() * (max - min))) }
+				,	genColor = function () { return (randomInRange(0, base - fuzz / 2) + shift) - fuzz / 2 + randomInRange(0, fuzz) }
+				,	takeThree = function () { return [genColor(), genColor(), genColor()] }
+				,	percentDifference = function(three) {
+					var d = function(x,y) { return Math.abs(x-y) / y * 100 }
+					,	x = d(three[0], three[1])
+					,	y = d(three[0], three[2])
+					,	z = d(three[1], three[2])
+					;
+
+					return (x + y + z) / 3
+				}
+				,	three = takeThree()
+				;
+
+				while(percentDifference(three) <= 20) three = takeThree()
+
+				return {
+					red: 	three[0],
+					blue:	three[1],
+					green:	three[2]
+				}
+			}
+
+			function colorToCSS (color) {
+				return "rgb(" + color.red + "," + color.green + "," + color.blue + ")";
+			}
+
+			$(function () {
+				var $canvas = $("#canvas")
+				;
+
+				for(var i = 0; i < 100; i++)
+					$("<li></li>")
+						.css('background-color', colorToCSS(createPastelColor()))
+						.appendTo($canvas);
+			})
+		</script>
+	</head>
+	<body>
+		<ul id="canvas"></ul>
+	</body>
+</html>
+
